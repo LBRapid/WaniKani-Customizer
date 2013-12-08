@@ -1,0 +1,33 @@
+{
+  "name": "WaniKani Customizer",
+  "short_name": "WK Customizer",
+  "version": "3.0",
+  "manifest_version": 2,
+  "description": "Upcoming Reviews timeline, review current level Radicals first, and more",
+  "icons": {"128": "Icon.png"},
+  "permissions": [
+    "http://*.wanikani.com/*",
+    "http://*.textfugu.com/*",
+    "http://*.etoeto.com/*",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*.wanikani.com/*"],
+      "js": ["jquery.js", "wanikani.js"]
+    },
+    {
+      "matches": ["http://*.textfugu.com/*", "http://*.etoeto.com/*"],
+      "js": ["jquery.js", "textfugu.js"]
+    }
+  ],
+  "web_accessible_resources": [
+  	"Icon.png",
+    "inject.js",
+    "common.css",
+    "custom.css",
+    "chrome-bootstrap.css",
+    "userscripts/collapse.css"
+  ],
+  "options_page": "options.html"
+}

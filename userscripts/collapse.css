@@ -1,0 +1,27 @@
+/* Collapsable forum quotes
+ * @author pankeki
+ */
+
+div.forum-post > blockquote > blockquote {
+    max-height: 22px;
+    overflow: hidden;
+    transition: 0.3s all;
+    cursor: pointer;
+}
+div.forum-post > blockquote > blockquote > .post-quote-author::before {
+    display: inline-block;
+    content: '\25B8';
+    font-size: 1.25em;
+    color: #ec009c;
+    margin: 1px 2px 0 -2px;
+    transition: 0.3s all;
+}
+div.forum-post > blockquote > blockquote.collapsable {
+    max-height: 2000px;
+    overflow: none;
+    background: rgba(0, 0, 0, 0.03);
+}
+div.forum-post > blockquote > blockquote.collapsable > .post-quote-author::before {
+    transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+}

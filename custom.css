@@ -1,0 +1,30 @@
+/* Meaning/Reading */
+#question-type.meaning {
+	background-image: none !important;
+	background-color: #fff !important;
+	color: #444444 !important;
+	border-bottom: 1px solid #dddddd !important;
+	text-shadow: none !important;
+}
+
+#question-type.reading {
+	background-image: none !important;
+	text-shadow: none !important;
+	border-top: 1px solid #333 !important;
+}
+
+/* UI tweaks */
+#customizer-stats {
+	display: inline-block;
+    margin-right: 0.5em;
+}
+.icon-level::before {
+	content: '\F148' !important;
+}
+.icon-burn::before {
+	content: '\F06d' !important;
+	color: #611 !important;
+}
+.active-level::before {
+	color: #f100a0 !important;
+}
