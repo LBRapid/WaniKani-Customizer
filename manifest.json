@@ -14,20 +14,20 @@
   "content_scripts": [
     {
       "matches": ["http://*.wanikani.com/*"],
-      "js": ["jquery.js", "wanikani.js"]
+      "js": ["js/jquery.js", "js/wanikani.js"]
     },
     {
       "matches": ["http://*.textfugu.com/*", "http://*.etoeto.com/*"],
-      "js": ["jquery.js", "textfugu.js"]
+      "js": ["js/jquery.js", "js/textfugu.js"]
     }
   ],
   "web_accessible_resources": [
   	"Icon.png",
-    "inject.js",
-    "common.css",
-    "custom.css",
-    "chrome-bootstrap.css",
+    "js/inject.js",
+    "css/common.css",
+    "css/custom.css",
+
     "userscripts/collapse.css"
   ],
-  "options_page": "options.html"
+  "options_page": "options/options.html"
 }

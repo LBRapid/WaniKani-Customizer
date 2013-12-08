@@ -4,19 +4,20 @@ var options;
 
 
 /* RESOURCES */
-function resourceUrlFor(name) {
+function resourceUrlFor(name, ext, directory) {
+	name = (directory ? directory : ext) + '/' + name + '.' + ext;
 	return isChromeExtension ? chrome.extension.getURL(name) : safari.extension.baseURI + name;
 }
 
-function createResource(name, isJS) {
+function createResource(name, isJS, directory) {
 	var element = document.createElement(isJS ? 'script' : 'link');
 	if (isJS) {
 		element.type = 'text/javascript';
-		element.src = resourceUrlFor(name + '.js');
+		element.src = resourceUrlFor(name, 'js', directory);
 	} else {
 		element.type = 'text/css';
 		element.rel = 'stylesheet';
-		element.href = resourceUrlFor(name + '.css');
+		element.href = resourceUrlFor(name, 'css', directory);
 	}
 	document.head.appendChild(element);
 	return element;
@@ -42,7 +43,7 @@ $(document).ready(function() {
 			if (!options.disable_custom_reviews)
 				createResource('custom', false);
 			if (!options.no_collapse)
-				createResource('userscripts/collapse', false);
+				createResource('collapse', false, 'userscripts');
 			createResource('inject', true);
 			insertNav(options.textfugu, options.etoeto);
 		});
