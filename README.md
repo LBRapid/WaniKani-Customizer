@@ -1,0 +1,4 @@
+WaniKani-Customizer
+===================
+
+WaniKani Customizer
