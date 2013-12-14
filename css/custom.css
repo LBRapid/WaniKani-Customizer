@@ -23,8 +23,11 @@
 }
 .icon-burn::before {
 	content: '\F06d' !important;
+}
+.burning {
 	color: #611 !important;
 }
+
 .active-level::before {
 	color: #f100a0 !important;
 }
