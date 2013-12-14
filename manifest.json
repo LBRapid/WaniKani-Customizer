@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["http://*.wanikani.com/*"],
-      "js": ["js/jquery.js", "js/wanikani.js"]
+      "js": ["js/jquery.js", "js/timeline.js", "js/wanikani.js"]
     },
     {
       "matches": ["http://*.textfugu.com/*", "http://*.etoeto.com/*"],
@@ -26,6 +26,7 @@
     "js/inject.js",
     "css/common.css",
     "css/custom.css",
+    "options/options.html",
 
     "userscripts/collapse.css"
   ],
