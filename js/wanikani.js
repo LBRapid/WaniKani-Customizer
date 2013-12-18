@@ -52,9 +52,9 @@ $(document).ready(function() {
 		chrome.storage.sync.get(null, function(items) {
 			options = items;
 			setOptions(items);
-			if (!options.disable_custom_reviews_i)
+			if (!options.custom_reviews_i)
 				createResource('custom', false);
-			if (!options.no_collapse_i)
+			if (!options.collapse_i)
 				createResource('collapse', false, 'userscripts');
 			createResource('inject', true);
 			insertNav(items.textfugu, items.etoeto);
@@ -68,7 +68,7 @@ $(document).ready(function() {
 			options = {};
 		// setOptions(options);
 		createResource('custom', false);
-		createResource('userscripts/collapse', false);
+		createResource('collapse', false, 'userscripts');
 		createResource('inject', true);
 		insertNav(true, true);
 	}
@@ -81,14 +81,16 @@ $(document).ready(function() {
 			var splitted = loc.pathname.split('/');
 			insertTimeline();
 		}
-	} else if (siteSection == 'account') {
+	} else if (siteSection === 'account') {
 		apiKey = $('input[placeholder="Key has not been generated"]').val();
-		console.log('Updated API key: ' + apiKey);
-		var alreadySaved = localStorage.getItem('apiKey');
-		localStorage.setItem('apiKey', apiKey);
-		if (!alreadySaved)
-			document.location.pathname = '/dashboard';
-	} else if (siteSection == 'review') {
+		if (apiKey) {
+			console.log('Updated API key: ' + apiKey);
+			var alreadySaved = localStorage.getItem('apiKey');
+			localStorage.setItem('apiKey', apiKey);
+			if (!alreadySaved)
+				document.location.pathname = '/dashboard';
+		}
+	} else if (siteSection === 'review') {
 		$('#stats').prepend('<span id="current-stats" style="display:none;"><i class="icon-level"></i><span id="current-count"></span></span><span id="burn-stats" style="display:none;"><i class="icon-burn"></i><span id="burn-count"></span></span>');
 	}
 	if (isChromeExtension) {

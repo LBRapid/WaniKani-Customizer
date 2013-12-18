@@ -206,7 +206,7 @@ $(function() {
 		revDisplay.attr('href', '/lesson/session');
 	}
 
-	if (!options.no_collapse_i) {
+	if (!options.collapse_i) {
 		$("div.forum-post > blockquote > blockquote").click(function() {
 			$(this).toggleClass('collapsable');
 		});

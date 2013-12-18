@@ -9,8 +9,8 @@ var option_groups = [
 		['Reviews & Lessons', 'checkbox'],
 		['Sort current level Radicals to the front of the queue', 'sort_rad_i', 'check-i'],
 		['Sort current level Kanji to the front of the queue', 'sort_kan', 'check'],
-		// ['Sort Burned items to the front of the queue', 'sort_burn_i', 'check-i'],
-		['Differentiate meanings and on/kun readings', 'disable_custom_reviews_i', 'check-i']
+		// ['Sort Burning items to the front of the queue', 'sort_burn_i', 'check-i'],
+		['Differentiate meanings and on/kun readings', 'custom_reviews_i', 'check-i']
 	],
 	[
 		['Tofugu Services', 'checkbox'],
@@ -23,7 +23,7 @@ var option_groups = [
 	],
 	[
 		['Userscripts', 'checkbox', 'Additional options created by the WaniKani community'],
-		['Collapsable nested quotes on the forums', 'no_collapse_i', 'check-i', ['pankeki', '2752']]
+		['Collapsable nested quotes on the forums', 'collapse_i', 'check-i', ['pankeki', '2752']]
 	]
 ];
 
