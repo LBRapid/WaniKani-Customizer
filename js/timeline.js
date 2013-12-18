@@ -268,34 +268,35 @@ function addData(data) {
 				}
 			}
 		}
-	}
-	if (++counted == 3) {
-		localStorage.setItem('reviewCache', JSON.stringify(times));
-		localStorage.setItem('pastCache', JSON.stringify(pastReviews));
-		localStorage.setItem('cacheExpiration', curr_date.getTime());
-		initCanvas();
+		if (++counted == 3) {
+			localStorage.setItem('reviewCache', JSON.stringify(times));
+			localStorage.setItem('pastCache', JSON.stringify(pastReviews));
+			localStorage.setItem('cacheExpiration', curr_date.getTime());
+			initCanvas();
+		}
 	}
 }
 
 function insertTimeline(path) {
 	apiKey = localStorage.getItem('apiKey');
-	if (apiKey) {
+	if (apiKey && apiKey.length == 32) {
 		$('section.review-status').before('<section id="r-timeline" style="display: none;"><h4>Reviews Timeline</h4><a class="help">?</a><form id="graph-form"><label><span id="g-timereviews"></span> reviews <span id="g-timeframe">in '+gHours+' hours</span> <input id="g-range" type="range" min="0" max="'+max_hours+'" value="'+gHours+'" step="6" name="g-ranged"></label></form><div id="graph-tip" style="display: none;"></div><canvas id="c-timeline" height="'+graphH+'"></canvas></section>');
-		var dataCache = localStorage.getItem('reviewCache');
-		if (dataCache) {
-			dataCache = JSON.parse(dataCache);
-			if (typeof dataCache !== "object") {
-				dataCache = null;
-				localStorage.setItem('reviewCache', null);
-			} else {
-				var cacheExpires = localStorage.getItem('cacheExpiration');
-				if (cacheExpires && curr_date - cacheExpires > 3600 * 1000) {
-					dataCache = null;
-					localStorage.setItem('reviewCache', null);
-				}
-			}
+		var dataCache, pastReviews;
+		try {
+			dataCache = JSON.parse(localStorage.getItem('reviewCache'));
+			pastReviews = JSON.parse(localStorage.getItem('pastCache'));
+		} catch(e) {
 		}
-		if (!dataCache) {
+		if (dataCache && pastReviews) {
+			var cacheExpires = localStorage.getItem('cacheExpiration');
+			if (cacheExpires && curr_date - cacheExpires > 60 * 60 * 1000)
+				dataCache = null;
+		}
+		if (!dataCache || !pastReviews) {
+			dataCache = null;
+			pastReviews = null;
+			localStorage.setItem('reviewCache', null);
+			localStorage.setItem('pastCache', null);
 			times = [];
 			firstReview = Number.MAX_VALUE;
 			for (var ext in api_calls) {
@@ -307,7 +308,6 @@ function insertTimeline(path) {
 			}
 		} else {
 			times = dataCache;
-			pastReviews = JSON.parse(localStorage.getItem('pastCache'));
 			for (var idx in times) {
 				var counts = times[idx];
 				if (counts) {
