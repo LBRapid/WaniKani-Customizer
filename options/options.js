@@ -29,7 +29,7 @@ var option_groups = [
 
 
 /* SAVE */
-var saveTimer, savedSucessfully, saved_options;
+var saveTimer, savedSucessfully, sendMessage;
 
 function waitToCancel() {
 	if (saveTimer)
@@ -61,9 +61,7 @@ function saveOption(theKey, theValue) {
 			savedSucessfully = true;
 		});
 	} else {
-		saved_options[theKey] = theValue;
-		console.log(saved_options);
-		localStorage.setItem('wk_options', JSON.stringify(saved_options));
+		sendMessage('update', {key: theKey, value: theValue});
 		status.innerHTML = "Saved.";
 		status.className = "saved";
 		savedSucessfully = true;
@@ -131,12 +129,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			initialize(items);
 		});
 	} else {
-		var items = localStorage.getItem('wk_options');
-		console.log(items);
-		if (items)
-			saved_options = JSON.parse(items);
-		if (!saved_options)
-			saved_options = {};
-		initialize(saved_options);
+		sendMessage = function(name, msg) {
+			safari.self.tab.dispatchMessage(name, msg);
+		}
+		function onMessageResponse(event) {
+			initialize(event.message);
+		}
+		safari.self.addEventListener('message', onMessageResponse, false);
+		sendMessage('wk_options');
 	}
 });

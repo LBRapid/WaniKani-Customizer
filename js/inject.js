@@ -36,7 +36,7 @@ if (window.$) {
 		setTimeout(function() {
 			listening = true;
 		}, 100)
-		var sortRad = !options.sort_rad_i, sortKan = !options.sort_kan_i;
+		var sortRad = !options.sort_rad_i, sortKan = options.sort_kan;
 		if (!sortRad && !sortKan)
 			return;
 		var storedReviews = $.jStorage.get("l/lessonQueue");
@@ -272,7 +272,7 @@ if (window.$) {
 			$('.lattice-single-character ul').each(function() {
 				var stor = [];
 				if (idx === 1) {
-					// stor = $(this).find('li').text().split('');
+					stor = $(this).find('li').text().split('');
 					return;
 				} else {
 					$(this).find('li').each(function() {
