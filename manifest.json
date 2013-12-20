@@ -1,7 +1,7 @@
 {
   "name": "WaniKani Customizer",
   "short_name": "WK Customizer",
-  "version": "3.0.1",
+  "version": "3.1",
   "manifest_version": 2,
   "description": "Upcoming Reviews timeline, review current level Radicals first, and more",
   "icons": {"128": "Icon.png"},

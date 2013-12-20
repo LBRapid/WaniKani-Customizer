@@ -68,7 +68,7 @@ if (window.$) {
 				if (sortRad)
 					idx = 0;
 			} else if (item.kan) {
-				if (sortKan && kanjiAdded < 1) {
+				if (sortKan && kanjiAdded < 5) {
 					idx = 1;
 					++kanjiAdded;
 				}
