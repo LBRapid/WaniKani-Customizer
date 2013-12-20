@@ -284,7 +284,7 @@ if (window.$) {
 			var nextTimeDisplay = $('.review-status li.next time');
 			if (nextTimeDisplay.length > 0) {
 				var diff = nextTimeDisplay.attr('datetime') - new Date().getTime() / 1000;
-				if (diff > 10) {
+				if (diff > 60) {
 					setTimeout(function() {
 						window.location.pathname = '/review/session';
 					}, Math.ceil(diff * 1000) + 1000);
