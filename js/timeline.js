@@ -74,6 +74,8 @@ function drawCanvas(clear) {
 				}
 			}
 		}
+		if (totalCount == 0)
+			maxCount = 0;
 		$('#g-timereviews').text(totalCount);
 
 		tFrac = tRes * (page_width - xOff) / 60 / gHours;
