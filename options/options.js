@@ -3,13 +3,13 @@ var isChromeExtension = typeof chrome != 'undefined';
 var option_groups = [
 	[
 		['Redirect WaniKani pages to reviews and lessons', 'checkbox'],
-		['When first available', 'redirect_i', 'check-i']
+		['When first available', 'redirect', 'check-i']
 	],
 	[
 		['Reviews & Lessons', 'checkbox'],
 		['Sort current level Radicals to the front of the queue', 'sort_rad_i', 'check-i'],
 		['Sort current level Kanji to the front of the queue', 'sort_kan', 'check'],
-		// ['Sort Burning items to the front of the queue', 'sort_burn_i', 'check-i'],
+		['Sort Burning items to the front of the queue', 'sort_burn_i', 'check-i'],
 		['Differentiate meanings and on/kun readings', 'custom_reviews_i', 'check-i']
 	],
 	[

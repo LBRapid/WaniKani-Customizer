@@ -27,14 +27,7 @@ function createResource(name, isJS, directory) {
 /* READY */
 function setOptions(items) {
 	options = items;
-
-	var div = document.createElement("div");
-	div.style.display = "none";
-	div.id = "customizer";
-	div.innerHTML = JSON.stringify(items);
-	document.body.appendChild(div);
-	// $('body').append('<div id="customizer" style="display:none;"></div>');
-	// $('#customizer').text(JSON.stringify(items));
+	var div = $('html > body').first().append('<div id="customizer" class="hidden">'+JSON.stringify(items)+'</div>');
 
 	if (!options.custom_reviews_i)
 		createResource('custom', false);
@@ -47,9 +40,9 @@ function setOptions(items) {
 function insertNav(hasTF, hasEE) {
 	var right_nav = $('.navbar-inner .nav-collapse ul.pull-right');
 	if (hasEE)
-		right_nav.prepend('<li class="nav-extras"><a href="http://www.etoeto.com/latest" target="_blank"><span style="display:block;">EE</span>EtoEto</a></li>');
+		right_nav.prepend('<li class="nav-extras"><a href="http://www.etoeto.com/latest" target="_blank"><span style="display:block;">えと</span>EtoEto</a></li>');
 	if (hasTF)
-		right_nav.prepend('<li class="nav-extras"><a href="http://www.textfugu.com/latest" target="_blank"><span style="display:block;">TF</span>TextFugu</a></li>');
+		right_nav.prepend('<li class="nav-extras"><a href="http://www.textfugu.com/latest" target="_blank"><span style="display:block;">トフ</span>TextFugu</a></li>');
 }
 
 // Message passing
@@ -58,10 +51,8 @@ if (!isChromeExtension) {
 		safari.self.tab.dispatchMessage(name, msg);
 	}
 	function onMessageResponse(event) {
-		if (!options) {
-			var msg = event.message;
-			setOptions(msg);
-		}
+		if (!options)
+			setOptions(event.message);
 	}
 	safari.self.addEventListener('message', onMessageResponse, false);
 }
@@ -75,7 +66,8 @@ $(document).ready(function() {
 	createResource('common', false);
 	if (isChromeExtension) {
 		chrome.storage.sync.get(null, function(items) {
-			setOptions(items);
+			if (!options)
+				setOptions(items);
 		});
 	} else {
 		sendMessage('wk_options');
