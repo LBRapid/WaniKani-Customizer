@@ -66,3 +66,11 @@ a.help:hover {
 .hidden {
 	display: none !important;
 }
+
+#lightning-mode {
+	margin-left: 13px;
+}
+#lightning-mode.active {
+	color: #eeee11;
+	opacity: 1;
+}
