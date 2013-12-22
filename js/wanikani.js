@@ -94,5 +94,5 @@ $(document).ready(function() {
 		$('#stats').prepend('<span id="current-stats" style="display:none;"><i class="icon-level"></i><span id="current-count"></span></span><span id="burn-stats" style="display:none;"><i class="icon-burn"></i><span id="burn-count"></span></span>');
 	}
 	var ourl = resourceUrlFor('options', 'html', 'options');
-	$("ul.dropdown-menu li:nth-child(3)").after('<li><a id="customizer-options" href="'+ourl+'" target="_blank">Customizer</a></li>');
+	$('.navbar .account ul.dropdown-menu li:nth-child(3)').after('<li><a id="customizer-options" href="'+ourl+'" target="_blank">Customizer</a></li>');
 });

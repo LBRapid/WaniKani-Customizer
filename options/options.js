@@ -9,7 +9,7 @@ var option_groups = [
 		['Reviews & Lessons', 'checkbox'],
 		['Sort current level Radicals to the front of the queue', 'sort_rad_i', 'check-i'],
 		['Sort current level Kanji to the front of the queue', 'sort_kan', 'check'],
-		['Sort Burning items to the front of the queue', 'sort_burn', 'check-i'],
+		['Sort Burning items to the front of the queue', 'sort_burn_i', 'check-i'],
 		['Differentiate meanings and on/kun readings', 'custom_reviews_i', 'check-i']
 	],
 	[
