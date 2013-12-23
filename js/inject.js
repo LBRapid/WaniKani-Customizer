@@ -20,10 +20,10 @@ if (window.$) {
 
 	function levelIndex(item, currRad, currKan) {
 		if (item.rad) {
-			if (currRad && radData.indexOf(item.en[0]) !== -1)
+			// if (currRad && radData.indexOf(item.en[0]) !== -1)
 				return 0;
 		} else if (currKan && item.kan) {
-			if (kanData.indexOf(item.kan) !== -1)
+			// if (kanData.indexOf(item.kan) !== -1)
 				return 1;
 		}
 		return 2;
@@ -92,7 +92,7 @@ if (window.$) {
 
 	function setReviewQueue() {
 		if (initialized && !listening)
-			return;
+			return false;
 		listening = false;
 		setTimeout(function() {
 			listening = true;
@@ -137,7 +137,6 @@ if (window.$) {
 			laterQueue.concat(itemsArrays[1]);
 		}
 		if (needsUpdating) {
-			hasSortingAvailable = true;
 			initialized = true;
 			$.jStorage.set('reviewQueue', laterQueue);
 			$.jStorage.set('activeQueue', actQueue);
@@ -145,6 +144,7 @@ if (window.$) {
 			if (prevItem.rad)
 				$.jStorage.set('questionType', 'meaning');
 			$.jStorage.set('currentItem', prevItem);
+			hasSortingAvailable = true;
 		}
 		if (currCount > 0)
 			$('#question #current-count').text(currCount);
@@ -152,6 +152,7 @@ if (window.$) {
 			$('#question #burn-count').text(burnCount);
 		$('#question #current-stats').toggle(currCount > 0);
 		$('#question #burn-stats').toggle(burnCount > 0);
+		return needsUpdating;
 	}
 
 	if ($.jStorage && document.getElementById('reviews')) {
@@ -206,13 +207,19 @@ if (window.$) {
 			var newCount = $('#question #available-count').text();
 			if (newCount > prevCount)
 				hasSortingAvailable = true;
-			if (hasSortingAvailable && !((!options.sort_burn_i && burning) || (!options.sort_rad_i && lIdx == 0) || (options.sort_kan && lIdx == 1))) {
+			var resort = hasSortingAvailable;
+			if (resort) {
+				if ((!options.sort_burn_i && burning) || (!options.sort_rad_i && lIdx == 0) || (options.sort_kan && lIdx == 1))
+					resort = false;
+			}
+			if (resort) {
 				console.log('Needs resorting');
 				initialized = true;
 				prevCount = newCount;
 				hasSortingAvailable = false;
-				setReviewQueue();
-				return;
+				if (setReviewQueue())
+					return;
+				// setReviewQueue();
 			}
 			var skipping = ignoreNextItem;
 			if (skipping) {
