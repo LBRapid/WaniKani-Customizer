@@ -8,6 +8,7 @@ if (!window.$) {
 }
 
 if (window.$) {
+	var hasSortingAvailable = false;
 	var listening = true, initialized = false;
 	var options, radData, kanData, prevItem, bookmarks, lightning;
 	var prevCount = 0;
@@ -136,14 +137,14 @@ if (window.$) {
 			laterQueue.concat(itemsArrays[1]);
 		}
 		if (needsUpdating) {
+			hasSortingAvailable = true;
+			initialized = true;
 			$.jStorage.set('reviewQueue', laterQueue);
 			$.jStorage.set('activeQueue', actQueue);
 			prevItem = actQueue[0];
-			console.log(prevItem);
 			if (prevItem.rad)
 				$.jStorage.set('questionType', 'meaning');
 			$.jStorage.set('currentItem', prevItem);
-			initialized = true;
 		}
 		if (currCount > 0)
 			$('#question #current-count').text(currCount);
@@ -203,6 +204,16 @@ if (window.$) {
 			var burning = item.srs == 8;
 			var lIdx = levelIndex(item, true, true);
 			var newCount = $('#question #available-count').text();
+			if (newCount > prevCount)
+				hasSortingAvailable = true;
+			if (hasSortingAvailable && !((!options.sort_burn_i && burning) || (!options.sort_rad_i && lIdx == 0) || (options.sort_kan && lIdx == 1))) {
+				console.log('Needs resorting');
+				initialized = true;
+				prevCount = newCount;
+				hasSortingAvailable = false;
+				setReviewQueue();
+				return;
+			}
 			var skipping = ignoreNextItem;
 			if (skipping) {
 				ignoreNextItem = false;
@@ -210,27 +221,19 @@ if (window.$) {
 				if (newCount == prevCount && lightning && prevItem) {
 					var e = prevItem;
 					var t = e.kan ? $.jStorage.get("k" + e.id) : e.voc ? $.jStorage.get("v" + e.id) : null;
-					console.log(t);
 					if (t && (typeof t.mc != "undefined" || typeof t.rc != "undefined")) {
 						var r = t.mc >= 1 ? "reading" : t.rc >= 1 ? "meaning" : null;
 						if (r !== null) {
-							console.log('Not finished!');
 							ignoreNextItem = true;
 							$.jStorage.set("questionType", r);
 							$.jStorage.set(key, e);
 							return;
 						}
 					}
-				// } else if (item.rad) {
-				// 	console.log('enforce rad');
-				// 	$.jStorage.set('questionType', 'meaning');
+				} else if (item.rad) {
+					// console.log('enforce rad');
+					$.jStorage.set('questionType', 'meaning');
 				}
-			}
-			if (!burning && lIdx == 2 && newCount > prevCount) {
-				initialized = true;
-				setReviewQueue();
-				prevCount = newCount;
-				return;
 			}
 			prevCount = newCount;
 			$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
@@ -305,13 +308,13 @@ if (window.$) {
 						var mut = mutations[idx].target;
 						if (mut.tagName === 'FIELDSET') {
 							if (mut.className === 'correct') {
-								var ae = $('#answer-exception');
-								if (ae.hasClass('animated')) {
-									setTimeout(function() {
-										ae.removeClass('animated');
-									}, 1000);
-									console.log(ae.text());
-								} // TODO remove test
+								// var ae = $('#answer-exception');
+								// if (ae.hasClass('animated')) {
+								// 	setTimeout(function() {
+								// 		ae.removeClass('animated');
+								// 	}, 3000);
+								// 	console.log(ae.text());
+								// }
 								$('#answer-form button').click();
 							} else {
 								$('#additional-content #option-item-info').click();
