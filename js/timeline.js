@@ -51,12 +51,10 @@ function drawCanvas(clear) {
 		var graphTimeScale = 60 * 60 * (gHours - 0.1);
 		if (gHours == 0) {
 			if (pastReviews) {
-				var total = 0;
 				for (var ti = 0; ti < 3; ++ti) {
-					total += pastReviews[ti];
+					totalCount += pastReviews[ti];
 				}
-				maxCount = total;
-				totalCount += total;
+				maxCount = totalCount;
 			}
 		} else {
 			for (var time in times) {
@@ -283,19 +281,18 @@ function insertTimeline(path) {
 	apiKey = localStorage.getItem('apiKey');
 	if (apiKey && apiKey.length == 32) {
 		$('section.review-status').before('<section id="r-timeline" style="display: none;"><h4>Reviews Timeline</h4><a class="help">?</a><form id="graph-form"><label><span id="g-timereviews"></span> reviews <span id="g-timeframe">in '+gHours+' hours</span> <input id="g-range" type="range" min="0" max="'+max_hours+'" value="'+gHours+'" step="6" name="g-ranged"></label></form><div id="graph-tip" style="display: none;"></div><canvas id="c-timeline" height="'+graphH+'"></canvas></section>');
-		var dataCache, pastReviews;
 		try {
-			dataCache = JSON.parse(localStorage.getItem('reviewCache'));
+			times = JSON.parse(localStorage.getItem('reviewCache'));
 			pastReviews = JSON.parse(localStorage.getItem('pastCache'));
 		} catch(e) {
 		}
-		if (dataCache && pastReviews) {
+		if (times && pastReviews) {
 			var cacheExpires = localStorage.getItem('cacheExpiration');
 			if (cacheExpires && curr_date - cacheExpires > 60 * 60 * 1000)
-				dataCache = null;
+				times = null;
 		}
-		if (!dataCache || !pastReviews) {
-			dataCache = null;
+		if (!times || !pastReviews) {
+			times = null;
 			pastReviews = null;
 			localStorage.setItem('reviewCache', null);
 			localStorage.setItem('pastCache', null);
@@ -309,7 +306,6 @@ function insertTimeline(path) {
 				});
 			}
 		} else {
-			times = dataCache;
 			for (var idx in times) {
 				var counts = times[idx];
 				if (counts) {
