@@ -20,10 +20,10 @@ if (window.$) {
 
 	function levelIndex(item, currRad, currKan) {
 		if (item.rad) {
-			// if (currRad && radData.indexOf(item.en[0]) !== -1)
+			if (currRad && radData.indexOf(item.en[0]) !== -1)
 				return 0;
 		} else if (currKan && item.kan) {
-			// if (kanData.indexOf(item.kan) !== -1)
+			if (kanData.indexOf(item.kan) !== -1)
 				return 1;
 		}
 		return 2;
@@ -91,12 +91,12 @@ if (window.$) {
 	}
 
 	function setReviewQueue() {
-		if (initialized && !listening)
+		if (!listening)
 			return false;
 		listening = false;
 		setTimeout(function() {
 			listening = true;
-		}, 1000);
+		}, 100);
 
 		var checkRad = !options.sort_rad_i, checkKan = options.sort_kan, checkBurn = !options.sort_burn_i;
 		var storedReviews = $.jStorage.get('activeQueue');
@@ -308,13 +308,14 @@ if (window.$) {
 					if (!initialized)
 						setReviewQueue();
 				}, 1000);
+				var disableLightning = false;
 				var observer = new WebKitMutationObserver(function(mutations) {
 					if (!lightning)
 						return;
 					for (var idx in mutations) {
 						var mut = mutations[idx].target;
 						if (mut.tagName === 'FIELDSET') {
-							if (mut.className === 'correct') {
+							if (!disableLightning && mut.className === 'correct') {
 								// var ae = $('#answer-exception');
 								// if (ae.hasClass('animated')) {
 								// 	setTimeout(function() {
@@ -325,12 +326,17 @@ if (window.$) {
 								$('#answer-form button').click();
 							} else {
 								$('#additional-content #option-item-info').click();
+								disableLightning = false;
 							}
 							break;
 						}
 					}
 				});
 				observer.observe(document.getElementById('question'), {attributes: true, subtree: true, attributeFilter: ['class']});
+				$('#answer-form button').click(function(event) {
+					if (event.which)
+						disableLightning = true;
+				});
 				return;
 			}
 		}
