@@ -199,6 +199,8 @@ if (window.$) {
 
 		var ignoreNextItem = false;
 		$.jStorage.listenKeyChange('currentItem', function(key, action) {
+			if (ignoreNextItem)
+				return;
 			var item = $.jStorage.get(key);
 			if (!item)
 				return;
@@ -232,8 +234,13 @@ if (window.$) {
 						var r = t.mc >= 1 ? "reading" : t.rc >= 1 ? "meaning" : null;
 						if (r !== null) {
 							ignoreNextItem = true;
+							listening = false;
 							$.jStorage.set("questionType", r);
 							$.jStorage.set(key, e);
+							setTimeout(function() {
+								ignoreNextItem = false;
+								listening = true;
+							}, 100);
 							return;
 						}
 					}
