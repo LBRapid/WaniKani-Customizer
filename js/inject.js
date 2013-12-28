@@ -12,6 +12,7 @@ if (window.$) {
 	var listening = true, initialized = false;
 	var options, radData, kanData, prevItem, bookmarks, lightning;
 	var prevCount = 0;
+	var burned_count = -1, curr_count = -1;
 
 	function updateBookmark(thread, page) {
 		bookmarks[thread] = page;
@@ -20,10 +21,10 @@ if (window.$) {
 
 	function levelIndex(item, currRad, currKan) {
 		if (item.rad) {
-			if (currRad && radData.indexOf(item.en[0]) !== -1)
+			if (currRad && radData && radData.indexOf(item.en[0]) !== -1)
 				return 0;
 		} else if (currKan && item.kan) {
-			if (kanData.indexOf(item.kan) !== -1)
+			if (kanData && kanData.indexOf(item.kan) !== -1)
 				return 1;
 		}
 		return 2;
@@ -105,53 +106,63 @@ if (window.$) {
 		} else {
 			storedReviews = $.jStorage.get('reviewQueue');
 		}
-		var needsUpdating;
-
-		var itemsArrays = [[], [], []];
-		var currCount = 0, burnCount = 0;
+		var rad_idx = -1, kan_idx = -1, burn_idx = -1;
+		curr_count = 0;
+		burned_count = 0;
 		for (var i = 0; i < storedReviews.length; ++i) {
 			var item = storedReviews[i];
 			if (item) {
-				var li = 2;
 				if (item.srs == 8) {
 					if (checkBurn)
-						li = 1;
-					++burnCount;
+						burn_idx = i;
+					++burned_count;
 				} else {
-					li = levelIndex(item, checkRad, checkKan);
-					if (li < 2)
-						++currCount;
+					var li = levelIndex(item, checkRad, checkKan);
+					if (li < 2) {
+						if (li == 1) {
+							kan_idx = i;
+						} else {
+							rad_idx = i;
+						}
+						++curr_count;
+					}
 				}
-				itemsArrays[li].push(item);
 			}
 		}
 
-		var actQueue = itemsArrays[0];
-		var laterQueue = itemsArrays[2];
-		var needsUpdating = true;
-		if (actQueue.length == 0) {
-			actQueue = itemsArrays[1];
-			if (actQueue.length == 0)
-				needsUpdating = false;
-		} else {
-			laterQueue.concat(itemsArrays[1]);
+		var active_idx = rad_idx;
+		if (active_idx == -1) {
+			if (kan_idx != -1) {
+				active_idx = kan_idx;
+			} else {
+				active_idx = burn_idx;
+			}
 		}
+		var needsUpdating = active_idx != -1;
 		if (needsUpdating) {
+			var next_array = storedReviews.splice(active_idx, 1);
+			var next_item = next_array[0];
 			initialized = true;
-			$.jStorage.set('reviewQueue', laterQueue);
-			$.jStorage.set('activeQueue', actQueue);
-			prevItem = actQueue[0];
-			if (prevItem.rad)
+			$.jStorage.set('reviewQueue', storedReviews);
+			$.jStorage.set('activeQueue', next_array);
+			prevItem = next_item;
+			if (next_item.rad)
 				$.jStorage.set('questionType', 'meaning');
-			$.jStorage.set('currentItem', prevItem);
+			$.jStorage.set('currentItem', next_item);
 			hasSortingAvailable = true;
 		}
-		if (currCount > 0)
-			$('#question #current-count').text(currCount);
-		if (burnCount > 0)
-			$('#question #burn-count').text(burnCount);
-		$('#question #current-stats').toggle(currCount > 0);
-		$('#question #burn-stats').toggle(burnCount > 0);
+		if (curr_count > 0) {
+			$('#question #current-count').text(curr_count);
+		} else {
+			curr_count = -1;
+		}
+		if (burned_count > 0) {
+			$('#question #burn-count').text(burned_count);
+		} else {
+			burned_count = -1;
+		}
+		$('#question #current-stats').toggle(curr_count > 0);
+		$('#question #burn-stats').toggle(burned_count > 0);
 		return needsUpdating;
 	}
 
@@ -163,15 +174,17 @@ if (window.$) {
 		$.jStorage.listenKeyChange('lastItems', function(key, action) {
 			if (!prevItem)
 				return;
-			if (prevItem.srs == 8) {
+			if (burned_count != -1 && prevItem.srs == 8) {
 				var currText = $('#question #burn-count');
 				var currValue = parseInt(currText.text());
+				--burned_count;
 				if (currValue > 1) {
 					currText.text(currValue - 1);
 				} else {
 					$('#question #burn-stats').hide();
+					burned_count = -1;
 				}
-			} else {
+			} else if (curr_count != -1) {
 				var lIdx = levelIndex(prevItem, true, true);
 				if (lIdx < 2) {
 					var currText = $('#question #current-count');
@@ -180,27 +193,20 @@ if (window.$) {
 						currText.text(currValue - 1);
 					} else {
 						$('#question #current-stats').hide();
+						curr_count = -1;
 					}
 				}
-			}
-		});
-		var ignoreNextActive = false;
-		$.jStorage.listenKeyChange('activeQueue', function(key, action) {
-			if (ignoreNextActive) {
-				ignoreNextActive = false;
-				return;
-			}
-			var active = $.jStorage.get(key);
-			if (active) {
-				ignoreNextActive = true;
-				$.jStorage.set(key, active.filter(function(n){return n}));
 			}
 		});
 
 		var ignoreNextItem = false;
 		$.jStorage.listenKeyChange('currentItem', function(key, action) {
-			if (ignoreNextItem)
-				return;
+			// if (ignoreNextItem)
+			// 	return;
+			// ignoreNextItem = true;
+			// setTimeout(function() {
+			// 	ignoreNextItem = false;
+			// }, 100);
 			var item = $.jStorage.get(key);
 			if (!item)
 				return;
@@ -209,8 +215,9 @@ if (window.$) {
 			var newCount = $('#question #available-count').text();
 			if (newCount > prevCount)
 				hasSortingAvailable = true;
-			var resort = hasSortingAvailable;
-			if (resort) {
+			var resort;
+			if (hasSortingAvailable) {
+				resort = true;
 				if ((!options.sort_burn_i && burning) || (!options.sort_rad_i && lIdx == 0) || (options.sort_kan && lIdx == 1))
 					resort = false;
 			}
@@ -219,14 +226,9 @@ if (window.$) {
 				initialized = true;
 				prevCount = newCount;
 				hasSortingAvailable = false;
-				if (setReviewQueue())
-					return;
-				// setReviewQueue();
+				setReviewQueue();
 			}
-			var skipping = ignoreNextItem;
-			if (skipping) {
-				ignoreNextItem = false;
-			} else if (lightning) {
+			if (lightning && !ignoreNextItem) {
 				if (newCount == prevCount && lightning && prevItem) {
 					var e = prevItem;
 					var t = e.kan ? $.jStorage.get("k" + e.id) : e.voc ? $.jStorage.get("v" + e.id) : null;
@@ -234,13 +236,8 @@ if (window.$) {
 						var r = t.mc >= 1 ? "reading" : t.rc >= 1 ? "meaning" : null;
 						if (r !== null) {
 							ignoreNextItem = true;
-							listening = false;
-							$.jStorage.set("questionType", r);
+							$.jStorage.set('questionType', r);
 							$.jStorage.set(key, e);
-							setTimeout(function() {
-								ignoreNextItem = false;
-								listening = true;
-							}, 100);
 							return;
 						}
 					}
@@ -252,17 +249,29 @@ if (window.$) {
 			prevCount = newCount;
 			$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
 			$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx !== 2);
-			if (!skipping) {
-				if (lIdx === 0) {
-					console.log(item.rad + ': ' + item.en[0]);
-				} else if (lIdx === 1) {
-					var read = item.emph === 'onyomi' ? item.on : item.kun;
-					console.log(item.kan + ': ' + item.en[0] + '  ' + read);
-				}
+			if (lIdx === 0) {
+				console.log(item.rad + ': ' + item.en[0]);
+			} else if (lIdx === 1) {
+				var read = item.emph === 'onyomi' ? item.on : item.kun;
+				console.log(item.kan + ': ' + item.en[0] + '  ' + read);
 			}
+			prevItem = item;
+		});
 
-			var kChar = item.kan;
+		var questionListening = true;
+		$.jStorage.listenKeyChange('questionType', function(key, action) {
+			if (!prevItem)
+				return;
+			if (!questionListening)
+				return false;
+			questionListening = false;
+			setTimeout(function() {
+				questionListening = true;
+			}, 100);
+
+			var kChar = prevItem.kan;
 			if (kChar) {
+				console.log(kChar);
 				setTimeout(function() {
 					var quest = $('#question-type.reading');
 					if (quest.length !== 0) {
@@ -271,7 +280,6 @@ if (window.$) {
 					}
 				}, 0);
 			}
-			prevItem = item;
 		});
 	}
 

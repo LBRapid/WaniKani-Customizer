@@ -1,7 +1,7 @@
 {
   "name": "WaniKani Customizer",
   "short_name": "WK Customizer",
-  "version": "3.2.2",
+  "version": "3.3",
   "manifest_version": 2,
   "description": "Upcoming Reviews timeline, sort Radicals and Kanji when reviewing, and more",
   "icons": {"128": "Icon.png"},
