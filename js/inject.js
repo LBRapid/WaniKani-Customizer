@@ -8,10 +8,9 @@ if (!window.$) {
 }
 
 if (window.$) {
-	var hasSortingAvailable = false;
+	var sort_tier = 0;
 	var listening = true, initialized = false;
 	var options, radData, kanData, prevItem, bookmarks, lightning;
-	var prevCount = 0;
 	var burned_count = -1, curr_count = -1;
 
 	function updateBookmark(thread, page) {
@@ -27,7 +26,7 @@ if (window.$) {
 			if (kanData && kanData.indexOf(item.kan) !== -1)
 				return 1;
 		}
-		return 2;
+		return 3;
 	}
 
 	// Lesson/Review queuing
@@ -131,11 +130,15 @@ if (window.$) {
 		}
 
 		var active_idx = rad_idx;
-		if (active_idx == -1) {
+		if (active_idx != -1) {
+			sort_tier = 0;
+		} else {
 			if (kan_idx != -1) {
 				active_idx = kan_idx;
+				sort_tier = 1;
 			} else {
 				active_idx = burn_idx;
+				sort_tier = 2;
 			}
 		}
 		var needsUpdating = active_idx != -1;
@@ -149,7 +152,8 @@ if (window.$) {
 			if (next_item.rad)
 				$.jStorage.set('questionType', 'meaning');
 			$.jStorage.set('currentItem', next_item);
-			hasSortingAvailable = true;
+		} else {
+			sort_tier = -1;
 		}
 		if (curr_count > 0) {
 			$('#question #current-count').text(curr_count);
@@ -200,6 +204,7 @@ if (window.$) {
 		});
 
 		var ignoreNextItem = false;
+		var currCount = 0;
 		$.jStorage.listenKeyChange('currentItem', function(key, action) {
 			// if (ignoreNextItem)
 			// 	return;
@@ -213,73 +218,42 @@ if (window.$) {
 			var burning = item.srs == 8;
 			var lIdx = levelIndex(item, true, true);
 			var newCount = $('#question #available-count').text();
+			var prevCount = currCount;
+			currCount = newCount;
 			if (newCount > prevCount)
-				hasSortingAvailable = true;
-			var resort;
-			if (hasSortingAvailable) {
-				resort = true;
-				if ((!options.sort_burn_i && burning) || (!options.sort_rad_i && lIdx == 0) || (options.sort_kan && lIdx == 1))
-					resort = false;
-			}
-			if (resort) {
-				console.log('Needs resorting');
-				initialized = true;
-				prevCount = newCount;
-				hasSortingAvailable = false;
+				sort_tier = 0;
+			if (sort_tier != -1 && sort_tier < (burning ? 2 : lIdx)) {
 				setReviewQueue();
 			}
-			if (lightning && !ignoreNextItem) {
-				if (newCount == prevCount && lightning && prevItem) {
-					var e = prevItem;
-					var t = e.kan ? $.jStorage.get("k" + e.id) : e.voc ? $.jStorage.get("v" + e.id) : null;
-					if (t && (typeof t.mc != "undefined" || typeof t.rc != "undefined")) {
-						var r = t.mc >= 1 ? "reading" : t.rc >= 1 ? "meaning" : null;
-						if (r !== null) {
-							ignoreNextItem = true;
-							$.jStorage.set('questionType', r);
-							$.jStorage.set(key, e);
-							return;
-						}
+			if (lightning && !ignoreNextItem && prevItem && newCount == prevCount) {
+				var e = prevItem;
+				var t = e.kan ? $.jStorage.get("k" + e.id) : e.voc ? $.jStorage.get("v" + e.id) : null;
+				if (t && (typeof t.mc != "undefined" || typeof t.rc != "undefined")) {
+					var r = t.mc >= 1 ? "reading" : t.rc >= 1 ? "meaning" : null;
+					if (r !== null) {
+						ignoreNextItem = true;
+						prevItem = item;
+						$.jStorage.set('questionType', r);
+						$.jStorage.set(key, e);
+						ignoreNextItem = false;
+						return;
 					}
-				} else if (item.rad) {
-					// console.log('enforce rad');
-					$.jStorage.set('questionType', 'meaning');
 				}
 			}
-			prevCount = newCount;
 			$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
-			$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx !== 2);
-			if (lIdx === 0) {
-				console.log(item.rad + ': ' + item.en[0]);
-			} else if (lIdx === 1) {
-				var read = item.emph === 'onyomi' ? item.on : item.kun;
-				console.log(item.kan + ': ' + item.en[0] + '  ' + read);
-			}
-			prevItem = item;
-		});
+			$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx < 2);
 
-		var questionListening = true;
-		$.jStorage.listenKeyChange('questionType', function(key, action) {
-			if (!prevItem)
-				return;
-			if (!questionListening)
-				return false;
-			questionListening = false;
-			setTimeout(function() {
-				questionListening = true;
-			}, 100);
-
-			var kChar = prevItem.kan;
+			var kChar = item.kan;
 			if (kChar) {
-				console.log(kChar);
 				setTimeout(function() {
 					var quest = $('#question-type.reading');
-					if (quest.length !== 0) {
+					if (quest.length > 0) {
 						var found = kunyomi_list[kChar] ? 'Kun' : 'On';
 						quest.html('<h1><strong>' + found + "'yomi</strong> Reading?</h1>");
 					}
 				}, 0);
 			}
+			prevItem = item;
 		});
 	}
 
@@ -331,14 +305,19 @@ if (window.$) {
 						var mut = mutations[idx].target;
 						if (mut.tagName === 'FIELDSET') {
 							if (!disableLightning && mut.className === 'correct') {
-								// var ae = $('#answer-exception');
-								// if (ae.hasClass('animated')) {
-								// 	setTimeout(function() {
-								// 		ae.removeClass('animated');
-								// 	}, 3000);
-								// 	console.log(ae.text());
-								// }
-								$('#answer-form button').click();
+								var ae = $('#answer-exception');
+								if (ae.length > 0 && ae.hasClass('animated') && ae.text() === 'Your answer was a bit off. Check the meaning to make sure you are correct') {
+									ae.removeClass('animated fadeInUp');
+// Did you know this item has multiple possible meanings?
+									setTimeout(function() {
+										ae = $('#answer-exception');
+										if (ae.length > 0 && !ae.hasClass('animated'))
+											$('#answer-form button').click();
+									}, 2000);
+									console.log(ae.text());
+								} else {
+									$('#answer-form button').click();
+								}
 							} else {
 								$('#additional-content #option-item-info').click();
 								disableLightning = false;
