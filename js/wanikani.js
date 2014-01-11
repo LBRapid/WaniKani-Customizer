@@ -34,6 +34,7 @@ function setOptions(items) {
 	if (!options.collapse_i)
 		createResource('collapse', false, 'userscripts');
 	createResource('inject', true);
+	createResource('sorting', true);
 	insertNav(items.textfugu, items.etoeto);
 }
 
