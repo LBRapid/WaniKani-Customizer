@@ -1,6 +1,6 @@
 WaniKani Customizer
 ===================
-A Chrome extension to enhance [WaniKani](http://www.wanikani.com/), the kanji learning site.
+A Chrome extension to enhance [WaniKani](www.wanikani.com/), the kanji learning site.
 
 ## Features
 * __Timeline__ - A detailed breakdown all of your reviews coming up in the next three days. Includes current level items (needed to level up) and Burning items too!

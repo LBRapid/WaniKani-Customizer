@@ -6,18 +6,18 @@
   "description": "Upcoming Reviews timeline, sort Radicals and Kanji when reviewing, and more",
   "icons": {"128": "Icon.png"},
   "permissions": [
-    "http://*.wanikani.com/*",
-    "http://*.textfugu.com/*",
-    "http://*.etoeto.com/*",
+    "*://*.wanikani.com/*",
+    "*://*.textfugu.com/*",
+    "*://*.etoeto.com/*",
     "storage"
   ],
   "content_scripts": [
     {
-      "matches": ["http://*.wanikani.com/*"],
+      "matches": ["*://*.wanikani.com/*"],
       "js": ["js/jquery.js", "js/timeline.js", "js/wanikani.js"]
     },
     {
-      "matches": ["http://*.textfugu.com/*", "http://*.etoeto.com/*"],
+      "matches": ["*://*.textfugu.com/*", "*://*.etoeto.com/*"],
       "js": ["js/jquery.js", "js/textfugu.js"]
     }
   ],
