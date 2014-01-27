@@ -28,7 +28,6 @@
     "css/common.css",
     "css/custom.css",
     "options/options.html",
-
     "userscripts/collapse.css"
   ],
   "options_page": "options/options.html"
