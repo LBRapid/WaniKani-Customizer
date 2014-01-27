@@ -53,11 +53,10 @@ if (window.$) {
 			});
 			var title = 'radicalData';
 			var idx = 0;
-			$('.lattice-single-character ul').each(function() {
+			$('.lattice-single-character').each(function() {
 				var stor = [];
 				if (idx === 1) {
 					stor = $(this).find('li').text().split('');
-					return;
 				} else {
 					$(this).find('li').each(function() {
 						var iName;
@@ -66,8 +65,9 @@ if (window.$) {
 					});
 				}
 				localStorage.setItem(title, stor);
+				if (++idx > 1)
+					return;
 				title = 'kanjiData';
-				++idx;
 			});
 		} else if (siteSection === 'chat') {
 			var pageNumber = splitted[5];

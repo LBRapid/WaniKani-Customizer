@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			html_str += '<p><label><input type="'+inputType+'" class="'+option[2]+'" name="'+option[2]+'" value="'+option[1]+'" /> ' + option[0] + '</label>';
 			var author = option[3];
 			if (author)
-				html_str += '<a href="http://www.wanikani.com/chat/api-and-third-party-apps/'+author[1]+'" class="byline" target="_blank"> by ' + author[0] + '</a>';
+				html_str += '<a href="//www.wanikani.com/chat/api-and-third-party-apps/'+author[1]+'" class="byline" target="_blank"> by ' + author[0] + '</a>';
 			html_str += '<p>';
 		}
 		html_str += '</div>';
