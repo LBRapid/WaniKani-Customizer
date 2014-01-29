@@ -85,7 +85,7 @@ if (window.$) {
 		var itemCount = $('.navbar-static-top li.lessons a span').text();
 		if (itemCount) {
 			if (itemCount != '0') {
-				if (options.redirect) {
+				if (options.redirect_first) {
 					if (localStorage.getItem('lessonsFound')) {
 						loadLessons = false;
 					} else {
@@ -98,7 +98,7 @@ if (window.$) {
 				localStorage.setItem('lessonsFound', false);
 			}
 		}
-		if (options.redirect) {
+		if (options.redirect_first) {
 			var nextTimeDisplay = $('.review-status li.next time');
 			if (nextTimeDisplay.length > 0) {
 				var diff = nextTimeDisplay.attr('datetime') - new Date().getTime() / 1000;

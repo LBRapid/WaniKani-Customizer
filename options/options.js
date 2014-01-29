@@ -3,7 +3,7 @@ var isChromeExtension = typeof chrome != 'undefined';
 var option_groups = [
 	[
 		['Redirect WaniKani pages to reviews and lessons', 'checkbox'],
-		['When first available', 'redirect', 'check-i']
+		['When first available', 'redirect_first', 'check']
 	],
 	[
 		['Reviews & Lessons', 'checkbox'],

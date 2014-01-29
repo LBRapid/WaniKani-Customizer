@@ -243,10 +243,13 @@ if (window.$ && $.jStorage) {
 
 				var kChar = item.kan;
 				if (kChar) {
-					var quest = $('#question-type.reading');
-					if (quest.length > 0) {
-						var found = item.emph == 'kunyomi' ? 'Kun' : 'On';
-						quest.html('<h1><strong>' + found + "'yomi</strong> Reading?</h1>");
+					if (!options.custom_reviews_i) {
+						var quest = $('#question-type.reading');
+						if (quest.length > 0) {
+							console.log(kChar + ' ' + item.emph);
+							var found = item.emph == 'kunyomi' ? 'Kun' : 'On';
+							quest.html('<h1><strong>' + found + "'yomi</strong> Reading?</h1>");
+						}
 					}
 				} else if (item.rad) {
 					$.jStorage.set('questionType', 'meaning');
