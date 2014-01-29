@@ -30,7 +30,7 @@ if (window.$ && $.jStorage) {
 				listening = true;
 			}, 100);
 
-			var sortRad = !options.sort_rad_i, sortKan = options.sort_kan;
+			var sortRad = !options.sort_rad_i, sortKan = options.sort_kan_lessons;
 			if (!sortRad && !sortKan)
 				return;
 			var storedReviews = $.jStorage.get("l/lessonQueue");
@@ -241,17 +241,7 @@ if (window.$ && $.jStorage) {
 				$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
 				$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx < 2);
 
-				var kChar = item.kan;
-				if (kChar) {
-					if (!options.custom_reviews_i) {
-						var quest = $('#question-type.reading');
-						if (quest.length > 0) {
-							console.log(kChar + ' ' + item.emph);
-							var found = item.emph == 'kunyomi' ? 'Kun' : 'On';
-							quest.html('<h1><strong>' + found + "'yomi</strong> Reading?</h1>");
-						}
-					}
-				} else if (item.rad) {
+				if (item.rad) {
 					$.jStorage.set('questionType', 'meaning');
 				}
 				prevItem = item;
@@ -273,6 +263,21 @@ if (window.$ && $.jStorage) {
 				$('#quiz-ready-continue').click();
 			});
 			observer.observe(document.getElementById('screen-quiz-ready'), {attributes: true, subtree: true, attributeFilter: ['class']});
+		}
+
+		if (!options.custom_reviews_i) {
+			$.jStorage.listenKeyChange(reviewing?'questionType':'l/questionType', function(key, action) {
+				setTimeout(function() {
+					var item = $.jStorage.get(reviewing?'currentItem':'l/currentQuizItem');
+					if (!item || !item.kan)
+						return;
+					var quest = $('#question-type.reading');
+					if (quest.length > 0) {
+						var found = item.emph == 'kunyomi' ? 'Kun' : 'On';
+						quest.html('<h1><strong>' + found + "'yomi</strong> Reading?</h1>");
+					}
+				}, 0);
+			});
 		}
 
 		// Lightning
