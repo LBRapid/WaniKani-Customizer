@@ -71,12 +71,14 @@ if (window.$ && $.jStorage) {
 			}
 			var actQueue = itemsArrays[0];
 			var saveForLater = itemsArrays[2];
-			if (actQueue.length == 0) {
+			var sortingFound = actQueue.length == 0;
+			if (sortingFound) {
 				actQueue = itemsArrays[1];
+				sortingFound = actQueue.length == 0;
 			} else {
 				saveForLater = saveForLater.concat(itemsArrays[1]);
 			}
-			if (actQueue[0]) {
+			if (sortingFound) {
 				$.jStorage.set('l/currentLesson', actQueue[0]);
 				$.jStorage.set('l/activeQueue', actQueue);
 				$.jStorage.set('l/lessonQueue', saveForLater);
@@ -153,18 +155,20 @@ if (window.$ && $.jStorage) {
 			} else {
 				sort_tier = -1;
 			}
-			if (curr_count > 0) {
-				$('#question #current-count').text(curr_count);
-			} else {
-				curr_count = -1;
+			if (!options.custom_reviews_i) {
+				if (curr_count > 0) {
+					$('#question #current-count').text(curr_count);
+				} else {
+					curr_count = -1;
+				}
+				if (burned_count > 0) {
+					$('#question #burn-count').text(burned_count);
+				} else {
+					burned_count = -1;
+				}
+				$('#question #current-stats').toggle(curr_count > 0);
+				$('#question #burn-stats').toggle(burned_count > 0);
 			}
-			if (burned_count > 0) {
-				$('#question #burn-count').text(burned_count);
-			} else {
-				burned_count = -1;
-			}
-			$('#question #current-stats').toggle(curr_count > 0);
-			$('#question #burn-stats').toggle(burned_count > 0);
 			return needsUpdating;
 		}
 
@@ -177,33 +181,35 @@ if (window.$ && $.jStorage) {
 			radData = localStorage.getItem('radicalData');
 			kanData = localStorage.getItem('kanjiData');
 
-			$.jStorage.listenKeyChange('lastItems', function(key, action) {
-				if (!prevItem)
-					return;
-				if (burned_count != -1 && prevItem.srs == 8) {
-					var currText = $('#question #burn-count');
-					var currValue = parseInt(currText.text());
-					--burned_count;
-					if (currValue > 1) {
-						currText.text(currValue - 1);
-					} else {
-						$('#question #burn-stats').hide();
-						burned_count = -1;
-					}
-				} else if (curr_count != -1) {
-					var lIdx = levelIndex(prevItem, true, true);
-					if (lIdx < 2) {
-						var currText = $('#question #current-count');
+			if (!options.custom_reviews_i) {
+				$.jStorage.listenKeyChange('lastItems', function(key, action) {
+					if (!prevItem)
+						return;
+					if (burned_count != -1 && prevItem.srs == 8) {
+						var currText = $('#question #burn-count');
 						var currValue = parseInt(currText.text());
+						--burned_count;
 						if (currValue > 1) {
 							currText.text(currValue - 1);
 						} else {
-							$('#question #current-stats').hide();
-							curr_count = -1;
+							$('#question #burn-stats').hide();
+							burned_count = -1;
+						}
+					} else if (curr_count != -1) {
+						var lIdx = levelIndex(prevItem, true, true);
+						if (lIdx < 2) {
+							var currText = $('#question #current-count');
+							var currValue = parseInt(currText.text());
+							if (currValue > 1) {
+								currText.text(currValue - 1);
+							} else {
+								$('#question #current-stats').hide();
+								curr_count = -1;
+							}
 						}
 					}
-				}
-			});
+				});
+			}
 
 			var ignoreNextItem = false;
 			var currCount = 0;
@@ -238,8 +244,10 @@ if (window.$ && $.jStorage) {
 						}
 					}
 				}
-				$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
-				$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx < 2);
+				if (!options.custom_reviews_i) {
+					$('.icon-chevron-right').toggleClass('icon-burn burning', burning);
+					$('.icon-chevron-right').toggleClass('icon-level active-level', !burning && lIdx < 2);
+				}
 
 				if (item.rad) {
 					$.jStorage.set('questionType', 'meaning');
@@ -263,6 +271,15 @@ if (window.$ && $.jStorage) {
 				$('#quiz-ready-continue').click();
 			});
 			observer.observe(document.getElementById('screen-quiz-ready'), {attributes: true, subtree: true, attributeFilter: ['class']});
+
+			if (!options.custom_reviews_i) {
+				var batchSize = $.jStorage.get('l/count/rad') + $.jStorage.get('l/count/kan') + $.jStorage.get('l/count/voc');
+				$('#stats ul').append('<li id="remaining-count" title="Number of lessons remaining">'+batchSize+'</li>');
+				$.jStorage.listenKeyChange('l/count/completed', function(key, action) {
+					var completed = $.jStorage.get(key);
+					$('#stats #remaining-count').text(batchSize - completed);
+				});
+			}
 		}
 
 		if (!options.custom_reviews_i) {
@@ -285,7 +302,7 @@ if (window.$ && $.jStorage) {
 		lightning = localStorage.getItem(ltItemName);
 		if (lightning === 'false')
 			lightning = false;
-		$(reviewing ? '#summary-button' : '#header-buttons').append('<a id="lightning-mode" href="#"'+(lightning?' class="active"':'')+'><i class="icon-bolt"></i></a>');
+		$(reviewing ? '#summary-button' : '#header-buttons').append('<a id="lightning-mode" href="#"'+(lightning?' class="active"':'')+' title="Lightning Mode makes '+(reviewing?'Reviewing':'Lessons')+' even faster - try it out! Click here to toggle it at any time."><i class="icon-bolt"></i></a>');
 		$('#lightning-mode').click(function() {
 			lightning = !lightning;
 			localStorage.setItem(ltItemName, lightning);

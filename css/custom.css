@@ -18,6 +18,18 @@
 	display: inline-block;
     margin-right: 0.5em;
 }
+#remaining-count::before {
+	content: '\F012' !important;
+}
+#completed-count::before {
+	content: '\F00C' !important;
+	margin-right: 0.5em !important;
+	font-family: FontAwesome !important;
+}
+#completed-count {
+	opacity: 1.0 !important;
+}
+
 .icon-level::before {
 	content: '\F148' !important;
 }
