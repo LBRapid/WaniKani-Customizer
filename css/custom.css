@@ -21,12 +21,12 @@
 #remaining-count::before {
 	content: '\F012' !important;
 }
-#completed-count::before {
+#lessons #completed-count::before {
 	content: '\F00C' !important;
 	margin-right: 0.5em !important;
 	font-family: FontAwesome !important;
 }
-#completed-count {
+#lessons #completed-count {
 	opacity: 1.0 !important;
 }
 

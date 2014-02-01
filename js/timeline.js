@@ -268,7 +268,7 @@ function addData(data) {
 				}
 			}
 		}
-		if (++counted == 3) {
+		if (++counted == 3 && times && times.length > 0) {
 			localStorage.setItem('reviewCache', JSON.stringify(times));
 			localStorage.setItem('pastCache', JSON.stringify(pastReviews));
 			localStorage.setItem('cacheExpiration', curr_date.getTime());
@@ -291,7 +291,7 @@ function insertTimeline(path) {
 			if (cacheExpires && curr_date - cacheExpires > 60 * 60 * 1000)
 				times = null;
 		}
-		if (!times || !pastReviews) {
+		if (!times || !pastReviews || times.length == 0) {
 			times = null;
 			pastReviews = null;
 			localStorage.setItem('reviewCache', null);

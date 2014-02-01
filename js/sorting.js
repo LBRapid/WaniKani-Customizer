@@ -274,6 +274,10 @@ if (window.$ && $.jStorage) {
 
 			if (!options.custom_reviews_i) {
 				var batchSize = $.jStorage.get('l/count/rad') + $.jStorage.get('l/count/kan') + $.jStorage.get('l/count/voc');
+				// setTimeout(function() { // TODO ensure correct count
+				// 	batchSize = $.jStorage.get('l/count/rad') + $.jStorage.get('l/count/kan') + $.jStorage.get('l/count/voc');
+				// 	$('#stats ul').append('<li id="remaining-count" title="Number of lessons remaining">'+batchSize+'</li>');
+				// }, 1000);
 				$('#stats ul').append('<li id="remaining-count" title="Number of lessons remaining">'+batchSize+'</li>');
 				$.jStorage.listenKeyChange('l/count/completed', function(key, action) {
 					var completed = $.jStorage.get(key);
