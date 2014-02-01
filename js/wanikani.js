@@ -27,7 +27,7 @@ function createResource(name, isJS, directory) {
 /* READY */
 function setOptions(items) {
 	options = items;
-	var div = $('html > body').first().append('<div id="customizer" class="hidden">'+JSON.stringify(items)+'</div>');
+	var div = $('html > body').first().prepend('<div id="customizer" class="hidden">'+JSON.stringify(items)+'</div>');
 
 	if (!options.custom_reviews_i)
 		createResource('custom', false);

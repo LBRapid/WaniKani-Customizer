@@ -14,15 +14,15 @@ if (window.$) {
 		bookmarks[thread] = page;
 		localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
 	}
+	var stored = $('#customizer').html();
+	if (stored && stored.length !== 0) {
+		window.options = JSON.parse(stored);
+	} else {
+		window.options = {};
+	}
 
 	// Page load
 	$(function() {
-		var stored = $('#customizer').html();
-		if (stored && stored.length !== 0) {
-			window.options = JSON.parse(stored);
-		} else {
-			window.options = {};
-		}
 		var revDisplay = $('li.reviews a');
 		if (revDisplay && revDisplay.find('span').text() != '0') {
 			revDisplay.attr('href', '/review/session');
